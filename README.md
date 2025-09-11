@@ -118,26 +118,33 @@ You will be assessed based on the sections you complete, with the difficulty lev
 
 ---
 
-## **Submission Guidelines**:
-1. **GitHub Repository**:
-   - Push all your code (frontend, backend, smart contracts, Docker files, etc.) to a new GitHub repository.
-   - Organize the repository with clear directories for each section (e.g., /frontend, /backend, /contracts, /docker).
-   - Ensure all sensitive information (like API keys or private keys) is excluded from the repository.
+## **📤 Submission Guidelines**:
+1. **🔗 GitHub Repository**:
+   - Push all your code (frontend, backend, smart contracts, Docker files, etc.) to **a new GitHub repository**.
+   - Organize the repository with clear directories, such as:
+       ```bash
+       (e.g., /frontend, /backend, /contracts, /docker).
+       ```
+   - Ensure all **sensitive information** (e.g., API keys, private keys, or secrets) is excluded from the repository.
+   - Set your repository to **Public** so it is accessible for review.
 
-2. **README**:
-   - Include a README.md file at the root of your repository with:
-     - An overview of your project.
-     - Instructions on how to set up and run the application locally.
-     - Prerequisites or dependencies.
-     - Docker Compose instructions (if applicable).
-     - Assumptions or decisions you made.
-     - Known issues or limitations.
+2. **📝 README**:
+   - Include a `README.md` at the root of your repository containing the following:
+     - A brief overview of the project
+     - Instructions to set up and run the application locally
+     - List of prerequisites or dependencies
+     - Docker Compose usage instructions (if applicable)
+     - Key assumptions or architectural decisions you made
+     - Known issues or limitations (if any)
 
-3. **Collaborator**:
-   - Add [apquinit](https://github.com/apquinit) and [beforeoafterm](https://github.com/beforeoafterm) as collaborators to your repository.
-
-4. **Schedule a Review**:
-   - Book an appointment with us to review your submission by scheduling a meeting with [Alex](https://calendly.com/apquinit/personal-meeting) or [N](https://calendly.com/n-at-ardata/tech-assessment). Include your GitHub repository link and any additional notes or comments.
+4. **📅 Schedule a Review**:
+   - Once your repository is ready and public:
+       1. **Do not add collaborators.**
+       2. Proceed to **book a technical interview** and **attach your GitHub repo link** in the scheduling form.
+   - Choose from the following Calendar Booking links based on your role:
+     - **Alex Quinit** (Senior & Backend Roles): [Book here](https://calendly.com/apquinit)
+     - **N Petterson** (Engineering Roles): [Book here](https://ro.am/beforeoafterm.w3.io/tech-assessment)
+     - **Aljun** (Project Manager & QA Roles): [Book here](https://calendly.com/aljun-corporate/15-catch-up-call)
 
 ---
 
