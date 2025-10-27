@@ -137,13 +137,8 @@ You will be assessed based on the sections you complete, with the difficulty lev
      - Key assumptions or architectural decisions you made
      - Known issues or limitations (if any)
 
-4. **📅 Schedule a Review**:
-   - Once your repository is ready and public:
-       1. **Do not add collaborators.**
-       2. Proceed to **book a technical interview** and **attach your GitHub repo link** in the scheduling form.
-   - Choose from the following Calendar Booking links based on your role:
-     - **Alex Quinit** (Senior & Backend Roles): [Book here](https://calendly.com/apquinit)
-     - **N Petterson** (Engineering Roles): [Book here](https://ro.am/beforeoafterm.w3.io/tech-assessment)
+3. **📅 Schedule a Review**:
+   - Once your repository is ready and public, kindly wait for the interview schedule instructions via e-mail. 
 
 ---
 
