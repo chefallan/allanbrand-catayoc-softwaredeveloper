@@ -22,3 +22,4 @@ pnpm-debug.log*
 /backend/dist
 /backend/.env
 /backend/package-lock.json
+/contracts/deployments

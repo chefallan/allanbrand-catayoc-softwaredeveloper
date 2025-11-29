@@ -3,7 +3,7 @@ import https from 'https'
 import readline from 'readline'
 import config from './config'
 
-const API_BASE = 'http://localhost:3001/api/ethereum'
+const API_BASE = 'http://localhost:3000/api/ethereum'
 
 interface EthereumData {
   address: string
@@ -21,7 +21,7 @@ interface EthereumDataError {
 }
 
 /**
- * Make an RPC call to the Ethereum network
+ * Make an RPC call to the Sepolia testnet
  */
 function rpcCall(method: string, params: any[]): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -34,7 +34,7 @@ function rpcCall(method: string, params: any[]): Promise<string> {
     })
 
     const options = {
-      hostname: 'eth-mainnet.g.alchemy.com',
+      hostname: 'eth-sepolia.g.alchemy.com',
       path: `/v2/${ALCHEMY_API_KEY}`,
       method: 'POST',
       headers: {
@@ -111,6 +111,12 @@ function makeRequest(address: string): Promise<any> {
  */
 function displayResponse(response: any): void {
   console.log('\n' + JSON.stringify(response, null, 2))
+  
+  // Show detailed balance information if successful
+  if (response.success && response.data && response.data.balance) {
+    const etherValue = parseFloat(response.data.balance.ether)
+    const gasPrice = parseFloat(response.data.gasPrice.gwei)
+  }
 }
 
 /**
@@ -150,9 +156,10 @@ function prompt(): void {
   })
 }
 
-console.log('\nEthereum Address Tracker')
+console.log('\nEthereum Address Tracker (Sepolia Testnet)')
 console.log('════════════════════════════════════════')
 console.log('   Enter an Ethereum address (0x...)')
+console.log('   Network: Sepolia (testnet only)')
 console.log('   Automatically saves to balances.json')
 console.log('   Caches gas price & block number')
 console.log('   Type "exit" to quit\n')

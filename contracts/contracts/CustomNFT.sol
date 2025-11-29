@@ -10,10 +10,19 @@ import "@openzeppelin/contracts/access/Ownable.sol";
  * 
  * Features:
  * - Standard ERC-721 token functionality
- * - URI storage for metadata
+ * - URI storage for metadata (IPFS)
  * - Minting capability (owner can mint)
+ * - Batch minting for multiple NFTs
  * - Burning capability
  * - Token transfers between users
+ * - Customizable base URI
+ * - Optional minting fees
+ * - Max supply: 10,000 NFTs
+ * 
+ * @notice This is a demonstration ERC-721 NFT contract for the Blockchain Integration Project
+ * @custom:version 1.0
+ * @custom:author Allanne Brand
+ * @custom:project Task 4: Full-Stack Integration
  */
 contract CustomNFT is ERC721, Ownable {
     // Token ID counter
@@ -31,6 +40,11 @@ contract CustomNFT is ERC721, Ownable {
     // Minting fee (optional)
     uint256 public mintingFee = 0;
 
+    // Contract metadata
+    string public constant VERSION = "1.0";
+    string public constant PROJECT = "Blockchain Integration Project";
+    uint256 public deploymentTimestamp;
+
     // Events
     event TokenMinted(address indexed to, uint256 indexed tokenId, string uri);
     event TokenBurned(uint256 indexed tokenId);
@@ -45,22 +59,22 @@ contract CustomNFT is ERC721, Ownable {
         ERC721("CustomNFT", "CNFT")
     {
         baseURI = initialBaseURI;
+        deploymentTimestamp = block.timestamp;
     }
 
     /**
-     * @dev Mints an NFT and assigns it to an address
+     * @dev Mints an NFT and assigns it to an address - FREE to mint!
      * @param to The address that will receive the NFT
      * @param uri The metadata URI for the token
      * 
      * Requirements:
      * - Only owner can mint
      * - Total supply cannot exceed MAX_SUPPLY
-     * - Correct minting fee must be paid if fee > 0
+     * - NO minting fee required
      */
-    function safeMint(address to, string memory uri) public payable onlyOwner {
+    function safeMint(address to, string memory uri) public onlyOwner {
         require(to != address(0), "Cannot mint to zero address");
         require(_tokenIdCounter < MAX_SUPPLY, "Max supply reached");
-        require(msg.value >= mintingFee, "Insufficient payment for minting fee");
 
         uint256 tokenId = _tokenIdCounter;
         _tokenIdCounter++;
@@ -72,11 +86,11 @@ contract CustomNFT is ERC721, Ownable {
     }
 
     /**
-     * @dev Mints multiple NFTs in a batch
+     * @dev Mints multiple NFTs in a batch - FREE to mint!
      * @param to The address that will receive all NFTs
      * @param uris Array of metadata URIs
      */
-    function batchMint(address to, string[] calldata uris) public payable onlyOwner {
+    function batchMint(address to, string[] calldata uris) public onlyOwner {
         require(to != address(0), "Cannot mint to zero address");
         require(uris.length > 0, "Must mint at least one token");
         require(
@@ -186,9 +200,48 @@ contract CustomNFT is ERC721, Ownable {
         require(_ownerOf(tokenId) != address(0), "Token does not exist");
         return _tokenURIs[tokenId];
     }
-
     /**
      * @dev Receive function to accept ETH payments for fees
      */
     receive() external payable {}
+
+    /**
+     * @dev Returns contract metadata
+     */
+    function getMetadata() public view returns (
+        string memory version,
+        string memory project,
+        string memory nftName,
+        string memory nftSymbol,
+        uint256 maxSupply,
+        uint256 currentSupply,
+        uint256 deployed,
+        string memory currentBaseURI,
+        uint256 currentMintingFee
+    ) {
+        return (
+            VERSION,
+            PROJECT,
+            name(),
+            symbol(),
+            MAX_SUPPLY,
+            _tokenIdCounter,
+            deploymentTimestamp,
+            baseURI,
+            mintingFee
+        );
+    }
+
+    /**
+     * @dev Returns contract information as a string
+     */
+    function getInfo() public view returns (string memory) {
+        return string(abi.encodePacked(
+            "CustomNFT v",
+            VERSION,
+            " - ",
+            PROJECT,
+            " - Max Supply: 10K NFTs"
+        ));
+    }
 }

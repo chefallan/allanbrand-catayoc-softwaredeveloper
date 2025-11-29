@@ -30,6 +30,17 @@ module.exports = {
     currency: "USD",
   },
   etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY || "",
+    apiKey: {
+      sepolia: process.env.ETHERSCAN_API_KEY || "SKIP",
+      goerli: process.env.ETHERSCAN_API_KEY || "SKIP",
+    },
+  },
+  sourcify: {
+    enabled: true,
+  },
+  verify: {
+    etherscan: {
+      apiUrl: "https://api.sepolia.etherscan.io",
+    }
   },
 };

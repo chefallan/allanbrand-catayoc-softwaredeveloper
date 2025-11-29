@@ -13,6 +13,13 @@ import "@openzeppelin/contracts/access/Ownable.sol";
  * - Minting capability (only owner can mint)
  * - Burning capability (anyone can burn their tokens)
  * - Pausable token transfers
+ * - Metadata: Token name (CUSTOM), symbol (CUSTOM), decimals (18)
+ * - Max supply: 1 billion tokens
+ * 
+ * @notice This is a demonstration ERC-20 token contract for the Blockchain Integration Project
+ * @custom:version 1.0
+ * @custom:author Allanne Brand
+ * @custom:project Task 4: Full-Stack Integration
  */
 contract CustomToken is ERC20, Ownable {
     // Maximum total supply cap (optional)
@@ -20,6 +27,11 @@ contract CustomToken is ERC20, Ownable {
 
     // Paused state
     bool public paused = false;
+
+    // Contract metadata
+    string public constant VERSION = "1.0";
+    string public constant PROJECT = "Blockchain Integration Project";
+    uint256 public deploymentTimestamp;
 
     // Events
     event TokensMinted(address indexed to, uint256 amount);
@@ -32,18 +44,20 @@ contract CustomToken is ERC20, Ownable {
      */
     constructor(uint256 initialSupply) ERC20("CustomToken", "CUSTOM") {
         require(initialSupply <= MAX_SUPPLY, "Initial supply exceeds max supply");
+        deploymentTimestamp = block.timestamp;
         _mint(msg.sender, initialSupply);
         emit TokensMinted(msg.sender, initialSupply);
     }
 
     /**
-     * @dev Mints tokens and assigns them to an address
+     * @dev Mints tokens and assigns them to an address - FREE to mint!
      * @param to The address that will receive the tokens
      * @param amount The amount of tokens to mint
      * 
      * Requirements:
      * - Only owner can mint
      * - Total supply cannot exceed MAX_SUPPLY
+     * - NO minting fee required
      */
     function mint(address to, uint256 amount) public onlyOwner {
         require(to != address(0), "Cannot mint to zero address");
@@ -109,11 +123,48 @@ contract CustomToken is ERC20, Ownable {
         paused = _paused;
         emit Paused(_paused);
     }
-
     /**
      * @dev Returns the number of decimals used for token display
      */
     function decimals() public pure override returns (uint8) {
         return 18;
+    }
+
+    /**
+     * @dev Returns contract metadata
+     */
+    function getMetadata() public view returns (
+        string memory version,
+        string memory project,
+        string memory tokenName,
+        string memory tokenSymbol,
+        uint8 tokenDecimals,
+        uint256 maxSupply,
+        uint256 currentSupply,
+        uint256 deployed
+    ) {
+        return (
+            VERSION,
+            PROJECT,
+            name(),
+            symbol(),
+            decimals(),
+            MAX_SUPPLY,
+            totalSupply(),
+            deploymentTimestamp
+        );
+    }
+
+    /**
+     * @dev Returns contract information as a string
+     */
+    function getInfo() public view returns (string memory) {
+        return string(abi.encodePacked(
+            "CustomToken v",
+            VERSION,
+            " - ",
+            PROJECT,
+            " - Max Supply: 1B tokens"
+        ));
     }
 }

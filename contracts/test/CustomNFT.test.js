@@ -178,27 +178,25 @@ describe("CustomNFT (ERC-721)", function () {
 
   describe("Minting Fee", function () {
     it("Should set minting fee", async function () {
-      const fee = ethers.parseEther("0.1");
+      const fee = ethers.parseEther("0");
       await customNFT.setMintingFee(fee);
 
       const mintingFee = await customNFT.mintingFee();
       expect(mintingFee).to.equal(fee);
     });
 
-    it("Should require payment for minting when fee is set", async function () {
-      const fee = ethers.parseEther("0.1");
+    it("Should allow free minting without payment", async function () {
+      const fee = ethers.parseEther("0");
       await customNFT.setMintingFee(fee);
 
-      await expect(
-        customNFT.safeMint(addr1.address, TOKEN_URI)
-      ).to.be.revertedWith("Insufficient payment for minting fee");
+      await customNFT.safeMint(addr1.address, TOKEN_URI);
+
+      const owner_of_token = await customNFT.ownerOf(0);
+      expect(owner_of_token).to.equal(addr1.address);
     });
 
-    it("Should accept payment for minting", async function () {
-      const fee = ethers.parseEther("0.1");
-      await customNFT.setMintingFee(fee);
-
-      await customNFT.safeMint(addr1.address, TOKEN_URI, { value: fee });
+    it("Should mint NFTs at no cost", async function () {
+      await customNFT.safeMint(addr1.address, TOKEN_URI);
 
       const owner_of_token = await customNFT.ownerOf(0);
       expect(owner_of_token).to.equal(addr1.address);
@@ -206,19 +204,11 @@ describe("CustomNFT (ERC-721)", function () {
   });
 
   describe("Fee Withdrawal", function () {
-    it("Should withdraw collected fees", async function () {
-      const fee = ethers.parseEther("0.1");
-      await customNFT.setMintingFee(fee);
+    it("Should not collect fees for free minting", async function () {
+      await customNFT.safeMint(addr1.address, "token1.json");
 
-      await customNFT.safeMint(addr1.address, "token1.json", { value: fee });
-
-      const initialBalance = await ethers.provider.getBalance(owner.address);
-      const tx = await customNFT.withdrawFees();
-      const receipt = await tx.wait();
-      const gasUsed = receipt.gasUsed * receipt.gasPrice;
-
-      const finalBalance = await ethers.provider.getBalance(owner.address);
-      expect(finalBalance).to.be.closeTo(initialBalance + fee - gasUsed, ethers.parseEther("0.01"));
+      const contractBalance = await ethers.provider.getBalance(customNFT.target);
+      expect(contractBalance).to.equal(0);
     });
   });
 });

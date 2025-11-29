@@ -8,10 +8,10 @@ export function initializeProvider() {
     throw new Error('Either VITE_INFURA_ID or VITE_ALCHEMY_API_KEY must be set')
   }
 
-  // Prefer Alchemy if available, fallback to Infura
+  // Prefer Alchemy if available, fallback to Infura (using Sepolia testnet)
   const rpcUrl = config.alchemyApiKey
-    ? `https://eth-mainnet.g.alchemy.com/v2/${config.alchemyApiKey}`
-    : `https://mainnet.infura.io/v3/${config.infuraId}`
+    ? `https://eth-sepolia.g.alchemy.com/v2/${config.alchemyApiKey}`
+    : `https://sepolia.infura.io/v3/${config.infuraId}`
 
   provider = new ethers.JsonRpcProvider(rpcUrl)
   return provider
