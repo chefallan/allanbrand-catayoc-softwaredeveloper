@@ -8,6 +8,16 @@ let useInMemoryDb = false
 let inMemoryDb: Map<string, any> = new Map()
 
 const DB_FILE = path.join(__dirname, '../data/balances.json')
+const NFT2_MINTS_FILE = path.join(__dirname, '../data/nft2_mints.json')
+
+interface NFT2Mint {
+  address: string
+  tokenId: number
+  txHash: string
+  timestamp: string
+}
+
+let nft2Mints: Map<string, NFT2Mint[]> = new Map()
 
 export async function initializeDatabase() {
   try {
@@ -32,11 +42,15 @@ export async function initializeDatabase() {
     // Create tables if they don't exist
     await createTables()
 
+    // Load NFT2 mints
+    loadNFT2Mints()
+
     return pool
   } catch (error) {
     console.warn('PostgreSQL not available, falling back to in-memory database')
     useInMemoryDb = true
     loadInMemoryDb()
+    loadNFT2Mints()
     return null
   }
 }
@@ -194,10 +208,75 @@ export async function getAllAccountBalances() {
   }
 }
 
+function loadNFT2Mints() {
+  try {
+    if (fs.existsSync(NFT2_MINTS_FILE)) {
+      const data = fs.readFileSync(NFT2_MINTS_FILE, 'utf-8')
+      const mints: NFT2Mint[] = JSON.parse(data)
+      
+      // Group by address
+      for (const mint of mints) {
+        const addr = mint.address.toLowerCase()
+        if (!nft2Mints.has(addr)) {
+          nft2Mints.set(addr, [])
+        }
+        nft2Mints.get(addr)!.push(mint)
+      }
+      console.log(`✓ Loaded ${mints.length} NFT2 mints from file`)
+    }
+  } catch (error) {
+    console.warn('Could not load NFT2 mints file, starting fresh')
+  }
+}
+
+function saveNFT2Mints() {
+  try {
+    const dir = path.dirname(NFT2_MINTS_FILE)
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true })
+    }
+    
+    const allMints: NFT2Mint[] = []
+    for (const mints of nft2Mints.values()) {
+      allMints.push(...mints)
+    }
+    
+    fs.writeFileSync(NFT2_MINTS_FILE, JSON.stringify(allMints, null, 2))
+    console.log(`[DB] NFT2 mints saved: ${allMints.length} total mints`)
+  } catch (error) {
+    console.error('Error saving NFT2 mints:', error)
+  }
+}
+
+export function getNFT2Mints(address: string): NFT2Mint[] {
+  return nft2Mints.get(address.toLowerCase()) || []
+}
+
+export function addNFT2Mint(address: string, tokenId: number, txHash: string): NFT2Mint {
+  const mint: NFT2Mint = {
+    address: address.toLowerCase(),
+    tokenId,
+    txHash,
+    timestamp: new Date().toISOString(),
+  }
+  
+  if (!nft2Mints.has(address.toLowerCase())) {
+    nft2Mints.set(address.toLowerCase(), [])
+  }
+  nft2Mints.get(address.toLowerCase())!.push(mint)
+  
+  // Save to file immediately
+  saveNFT2Mints()
+  
+  return mint
+}
+
 export async function closeDatabase() {
   if (useInMemoryDb) {
     saveInMemoryDb()
   }
+  // Always save NFT2 mints
+  saveNFT2Mints()
   if (pool) {
     await pool.end()
   }

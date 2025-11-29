@@ -1,0 +1,33 @@
+{
+  "name": "CustomNFT #19",
+  "description": "CustomNFT #19 from the 100 piece collection. Rarity: Legendary. Element: Cosmic.",
+  "image": "ipfs://bafybeig5xvfwi2e2bdai6lngjzok2aktxeyqorx6gwpw25mu5p4bjmqtaa/base.svg",
+  "external_url": "https://blockchainintegration.dev",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "Legendary"
+    },
+    {
+      "trait_type": "Element",
+      "value": "Cosmic"
+    },
+    {
+      "trait_type": "Token ID",
+      "value": "19"
+    },
+    {
+      "trait_type": "Collection",
+      "value": "CustomNFT"
+    }
+  ],
+  "properties": {
+    "category": "utility",
+    "creators": [
+      {
+        "address": "0x",
+        "share": 100
+      }
+    ]
+  }
+}

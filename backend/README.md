@@ -48,9 +48,10 @@ backend/
 
 **Required:**
 ```bash
-VITE_ALCHEMY_API_KEY=your_alchemy_api_key_here
-VITE_TOKEN_ADDRESS=0x95C8f7166af42160a0C9472D6Db617163DEd44e8  # Sepolia token
-VITE_NFT_ADDRESS=0xC561FE4044aF8B6176B64D8Da110420958411CAC    # Sepolia NFT
+VITE_CONTRACT_ADDRESS=0x7dC6ADE8985B153b349a823bbcE30f10f2e2A66d
+VITE_NFT_CONTRACT_ADDRESS=0x4752489c774D296F41BA5D3F8A2C7E551299c9c6
+VITE_NFT2_CONTRACT_ADDRESS=0xEDb0064eB0299Fb22eEB3DeA79f5cd258328Aa0A
+VITE_SEPOLIA_RPC=https://eth-sepolia.g.alchemy.com/v2/demo
 ```
 
 **Optional:**
@@ -61,9 +62,11 @@ NODE_ENV=development
 PORT=3000
 ```
 
-## 📡 API Endpoints (6 Total)
+## 📡 API Endpoints (9 Total)
 
-### 1. GET `/api/address/details/:address`
+### Token Endpoints (4)
+
+#### 1. GET `/api/address/details/:address`
 Returns balance, gas price, and block information for any Ethereum address on Sepolia.
 
 **Parameters:**
@@ -74,7 +77,7 @@ Returns balance, gas price, and block information for any Ethereum address on Se
 {
   "success": true,
   "data": {
-    "address": "0x95C8f7166af42160a0C9472D6Db617163DEd44e8",
+    "address": "0x7dC6ADE8985B153b349a823bbcE30f10f2e2A66d",
     "balance": {
       "eth": "0.049935684043828771",
       "wei": "49935684043828771"
@@ -84,14 +87,14 @@ Returns balance, gas price, and block information for any Ethereum address on Se
       "wei": "25500000000"
     },
     "blockNumber": 6234567,
-    "timestamp": "2025-11-28T15:30:00Z"
+    "timestamp": "2025-11-29T15:30:00Z"
   }
 }
 ```
 
 ---
 
-### 2. GET `/api/tokens/details/:address`
+#### 2. GET `/api/tokens/details/:address`
 Returns user's token balance and complete token metadata (name, symbol, decimals, total supply).
 
 **Parameters:**
@@ -102,9 +105,9 @@ Returns user's token balance and complete token metadata (name, symbol, decimals
 {
   "success": true,
   "data": {
-    "address": "0x95C8f7166af42160a0C9472D6Db617163DEd44e8",
+    "address": "0x7dC6ADE8985B153b349a823bbcE30f10f2e2A66d",
     "contract": {
-      "address": "0x95C8f7166af42160a0C9472D6Db617163DEd44e8",
+      "address": "0x7dC6ADE8985B153b349a823bbcE30f10f2e2A66d",
       "name": "CustomToken",
       "symbol": "CTK"
     },
@@ -124,14 +127,14 @@ Returns user's token balance and complete token metadata (name, symbol, decimals
       "project": "Blockchain Integration Project",
       "deploymentTimestamp": 1732880645
     },
-    "timestamp": "2025-11-28T15:30:00Z"
+    "timestamp": "2025-11-29T15:30:00Z"
   }
 }
 ```
 
 ---
 
-### 3. POST `/api/tokens/mint`
+#### 3. POST `/api/tokens/mint`
 Records a token mint transaction in the database.
 
 **Request Body:**
@@ -153,14 +156,14 @@ Records a token mint transaction in the database.
     "address": "0x1234567890abcdef1234567890abcdef12345678",
     "amount": "1000000000000000000",
     "tx_hash": "0xabcd...1234",
-    "created_at": "2025-11-28T15:30:00Z"
+    "created_at": "2025-11-29T15:30:00Z"
   }
 }
 ```
 
 ---
 
-### 4. GET `/api/tokens/mints/:address`
+#### 4. GET `/api/tokens/mints/:address`
 Returns all mint transactions for a specific address.
 
 **Parameters:**
@@ -176,7 +179,7 @@ Returns all mint transactions for a specific address.
       "address": "0x1234567890abcdef1234567890abcdef12345678",
       "amount": "1000000000000000000",
       "tx_hash": "0xabc...123",
-      "created_at": "2025-11-28T15:20:00Z"
+      "created_at": "2025-11-29T15:20:00Z"
     }
   ],
   "total": 1,
@@ -196,7 +199,92 @@ Returns all mint transactions for a specific address.
 
 ---
 
-### 5. GET `/api/tokens/stats`
+### NFT2 Fixed Collection Endpoints (3 - NEW!)
+
+#### 5. POST `/api/nft2/track-mint`
+Records an NFT2 mint transaction (called automatically by frontend).
+
+**Request Body:**
+```json
+{
+  "address": "0xcdb426c2c1d1863967ea66b581fb55c62b2fa54b",
+  "tokenId": 0,
+  "txHash": "0x1234567890abcdef..."
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "NFT2 mint tracked successfully",
+  "data": {
+    "address": "0xcdb426c2c1d1863967ea66b581fb55c62b2fa54b",
+    "tokenId": 0,
+    "txHash": "0x1234567890abcdef...",
+    "timestamp": "2025-11-29T10:15:00.000Z"
+  }
+}
+```
+
+---
+
+#### 6. GET `/api/nft2/mints/:address`
+Returns all NFT2 mints for a specific address.
+
+**Parameters:**
+- `address` (required): Ethereum address to query
+
+**Response:**
+```json
+{
+  "success": true,
+  "address": "0xcdb426c2c1d1863967ea66b581fb55c62b2fa54b",
+  "mintsCount": 4,
+  "nextTokenId": 4,
+  "mints": [
+    {
+      "address": "0xcdb426c2c1d1863967ea66b581fb55c62b2fa54b",
+      "tokenId": 0,
+      "txHash": "0x1234...",
+      "timestamp": "2025-11-29T10:00:00.000Z"
+    },
+    {
+      "address": "0xcdb426c2c1d1863967ea66b581fb55c62b2fa54b",
+      "tokenId": 1,
+      "txHash": "0x5678...",
+      "timestamp": "2025-11-29T10:05:00.000Z"
+    }
+  ]
+}
+```
+
+---
+
+#### 7. GET `/api/nft2/next-token/:address`
+Returns the next token ID to mint (queries blockchain first, falls back to backend tracking).
+
+**Parameters:**
+- `address` (required): Ethereum address to query
+
+**Response:**
+```json
+{
+  "success": true,
+  "address": "0xcdb426c2c1d1863967ea66b581fb55c62b2fa54b",
+  "nextTokenId": 4,
+  "blockchainSupply": 4,
+  "backedUpMints": 4
+}
+```
+
+**Note:** `nextTokenId` is determined by querying `contract.totalSupply()` directly from the blockchain, ensuring accuracy across multiple clients.
+
+---
+
+### Additional Endpoints (2)
+
+#### 8. GET `/api/tokens/stats`
 Returns global token minting statistics.
 
 **Response:**
@@ -207,21 +295,21 @@ Returns global token minting statistics.
     "totalMints": 42,
     "totalAmount": "42000000000000000000000",
     "uniqueAddresses": 15,
-    "timestamp": "2025-11-28T15:30:00Z"
+    "timestamp": "2025-11-29T15:30:00Z"
   }
 }
 ```
 
 ---
 
-### 6. GET `/api/health`
+#### 9. GET `/api/health`
 Health check endpoint. Returns 200 if server is running.
 
 **Response:**
 ```json
 {
   "status": "ok",
-  "timestamp": "2025-11-28T15:30:00Z"
+  "timestamp": "2025-11-29T15:30:00Z"
 }
 ```
 
@@ -272,13 +360,19 @@ Server starts on `http://localhost:3000`
 curl http://localhost:3000/api/health
 
 # Get address details
-curl http://localhost:3000/api/address/details/0x95C8f7166af42160a0C9472D6Db617163DEd44e8
+curl http://localhost:3000/api/address/details/0x7dC6ADE8985B153b349a823bbcE30f10f2e2A66d
 
 # Get token details
-curl http://localhost:3000/api/tokens/details/0x95C8f7166af42160a0C9472D6Db617163DEd44e8
+curl http://localhost:3000/api/tokens/details/0x7dC6ADE8985B153b349a823bbcE30f10f2e2A66d
 
-# Get mint history
-curl http://localhost:3000/api/tokens/mints/0x95C8f7166af42160a0C9472D6Db617163DEd44e8
+# Get token mint history
+curl http://localhost:3000/api/tokens/mints/0x7dC6ADE8985B153b349a823bbcE30f10f2e2A66d
+
+# Get NFT2 mint history (NEW)
+curl http://localhost:3000/api/nft2/mints/0x7dC6ADE8985B153b349a823bbcE30f10f2e2A66d
+
+# Get next NFT2 token ID (NEW)
+curl http://localhost:3000/api/nft2/next-token/0x7dC6ADE8985B153b349a823bbcE30f10f2e2A66d
 
 # Get global stats
 curl http://localhost:3000/api/tokens/stats
@@ -293,12 +387,14 @@ curl http://localhost:3000/api/tokens/stats
 **RPC Endpoint:** eth-sepolia.g.alchemy.com  
 
 **Deployed Contracts:**
-- Token (ERC-20): `0x95C8f7166af42160a0C9472D6Db617163DEd44e8`
-- NFT (ERC-721): `0xC561FE4044aF8B6176B64D8Da110420958411CAC`
+- Token (ERC-20): `0x7dC6ADE8985B153b349a823bbcE30f10f2e2A66d`
+- NFT (ERC-721): `0x4752489c774D296F41BA5D3F8A2C7E551299c9c6`
+- NFT2 (Fixed Collection): `0xEDb0064eB0299Fb22eEB3DeA79f5cd258328Aa0A`
 
 View on block explorer:
-- https://sepolia.etherscan.io/address/0x95C8f7166af42160a0C9472D6Db617163DEd44e8
-- https://sepolia.etherscan.io/address/0xC561FE4044aF8B6176B64D8Da110420958411CAC
+- https://sepolia.etherscan.io/address/0x7dC6ADE8985B153b349a823bbcE30f10f2e2A66d
+- https://sepolia.etherscan.io/address/0x4752489c774D296F41BA5D3F8A2C7E551299c9c6
+- https://sepolia.etherscan.io/address/0xEDb0064eB0299Fb22eEB3DeA79f5cd258328Aa0A
 
 ---
 
@@ -313,10 +409,16 @@ Frontend Request (React)
         ↓
 [cache.ts] - Cache data for 30s (optional)
         ↓
-[database.ts] - Save to PostgreSQL (optional)
+[database.ts] - Save to PostgreSQL or JSON file
         ↓
 JSON Response → Frontend Display
 ```
+
+**Data Persistence (NFT2 Mints):**
+- Saved to `backend/data/nft2_mints.json`
+- Loaded on server startup
+- Survives server restarts
+- Falls back to in-memory tracking if file unavailable
 
 ---
 
@@ -327,37 +429,45 @@ JSON Response → Frontend Display
 │   Frontend (React on :5173)   │
 └───────────┬───────────────────┘
             │
-            │ HTTP Requests
+            │ HTTP Requests (CORS enabled)
             ↓
-┌───────────────────────────────┐
-│  Backend API (Express :3000)  │
-│  ├─ /api/address/details      │
-│  ├─ /api/tokens/details       │
-│  ├─ /api/tokens/mint          │
-│  ├─ /api/tokens/mints         │
-│  ├─ /api/tokens/stats         │
-│  └─ /api/health               │
-└───────────┬───────────────────┘
+┌───────────────────────────────────┐
+│  Backend API (Express :3000)      │
+│  ├─ /api/address/details          │
+│  ├─ /api/tokens/details           │
+│  ├─ /api/tokens/mint              │
+│  ├─ /api/tokens/mints             │
+│  ├─ /api/nft2/track-mint (NEW)    │
+│  ├─ /api/nft2/mints (NEW)         │
+│  ├─ /api/nft2/next-token (NEW)    │
+│  ├─ /api/tokens/stats             │
+│  └─ /api/health                   │
+└───────────┬───────────────────────┘
             │
-            ↓
-┌───────────────────────────────┐
-│  Sepolia RPC (Alchemy)        │
-│  Chain ID: 11155111           │
-└───────────┬───────────────────┘
-            │
-            ↓
-┌───────────────────────────────┐
-│  Smart Contracts (Sepolia)    │
-│  ├─ CustomToken (ERC-20)      │
-│  └─ CustomNFT (ERC-721)       │
-└───────────────────────────────┘
+            ├─────────────────────────┐
+            ↓                         ↓
+┌────────────────────────┐  ┌──────────────────────┐
+│ Sepolia RPC (Alchemy)  │  │ Data Storage         │
+│ Chain ID: 11155111     │  │ ├─ PostgreSQL        │
+└────────────┬───────────┘  │ ├─ Redis Cache       │
+             │               │ └─ JSON File        │
+             ↓               └──────────────────────┘
+┌───────────────────────────┐
+│ Smart Contracts (Sepolia) │
+│ ├─ CustomToken (ERC-20)   │
+│ ├─ CustomNFT (ERC-721)    │
+│ └─ CustomNFT2 (Fixed-100) │
+└───────────────────────────┘
 ```
 
 ---
 
 ## 📋 Key Features
 
-✅ **6 REST API Endpoints** - Complete token and address management  
+✅ **9 REST API Endpoints** - Complete token management + NFT2 tracking  
+✅ **3 NFT2 Endpoints** - Track and query fixed collection mints (NEW)  
+✅ **Blockchain-First State** - Queries contract.totalSupply() for accurate next token ID  
+✅ **Persistent Mint Tracking** - Saves to data/nft2_mints.json (survives restarts)  
 ✅ **Sepolia Network** - Testnet-only, chain ID verification  
 ✅ **Gas Price Tracking** - Real-time Gwei and Wei data  
 ✅ **Block Number** - Current block height from Sepolia  

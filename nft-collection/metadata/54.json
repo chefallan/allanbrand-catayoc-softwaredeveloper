@@ -1,0 +1,33 @@
+{
+  "name": "CustomNFT #54",
+  "description": "CustomNFT #54 from the 100 piece collection. Rarity: Rare. Element: Sapphire.",
+  "image": "ipfs://bafybeig5xvfwi2e2bdai6lngjzok2aktxeyqorx6gwpw25mu5p4bjmqtaa/base.svg",
+  "external_url": "https://blockchainintegration.dev",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "Rare"
+    },
+    {
+      "trait_type": "Element",
+      "value": "Sapphire"
+    },
+    {
+      "trait_type": "Token ID",
+      "value": "54"
+    },
+    {
+      "trait_type": "Collection",
+      "value": "CustomNFT"
+    }
+  ],
+  "properties": {
+    "category": "utility",
+    "creators": [
+      {
+        "address": "0x",
+        "share": 100
+      }
+    ]
+  }
+}

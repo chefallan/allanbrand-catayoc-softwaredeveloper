@@ -1,9 +1,10 @@
 import { Router, Request, Response, NextFunction } from 'express'
 import { getEthereumData, getGasPrice, getBlockNumber, getProvider } from './ethereum'
 import { getFromCache, setCache } from './cache'
-import { saveAccountBalance } from './database'
+import { saveAccountBalance, getNFT2Mints, addNFT2Mint } from './database'
 import { validateAddress } from './middleware'
 import { ethers } from 'ethers'
+import config from './config'
 
 const router = Router()
 
@@ -277,7 +278,7 @@ router.get('/tokens/stats', async (req: Request, res: Response) => {
 router.get('/tokens/details/:address', validateAddress, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { address } = req.params
-    const contractAddress = process.env.VITE_CONTRACT_ADDRESS || '0x95C8f7166af42160a0C9472D6Db617163DEd44e8'
+    const contractAddress = config.contractAddresses.token
 
     const CUSTOM_TOKEN_ABI = [
       'function name() public view returns (string)',
@@ -391,6 +392,82 @@ router.get('/test/cache', async (req: Request, res: Response) => {
       key: testKey,
       cached: cached,
       message: 'Data retrieved from cache',
+    })
+  }
+})
+
+// NFT2 Minting tracking
+// POST /api/nft2/track-mint - Track NFT2 mint for an address
+router.post('/nft2/track-mint', validateAddress, async (req: Request, res: Response) => {
+  try {
+    const { address, tokenId, txHash } = req.body
+    
+    if (!address || typeof tokenId !== 'number' || !txHash) {
+      res.status(400).json({
+        success: false,
+        error: 'Missing required fields: address, tokenId, txHash',
+      })
+      return
+    }
+
+    // Add to database (persisted)
+    const mint = addNFT2Mint(address, tokenId, txHash)
+
+    res.json({
+      success: true,
+      message: `Tracked NFT2 mint: Token #${tokenId}`,
+      data: mint,
+    })
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      error: err.message || 'Failed to track NFT2 mint',
+    })
+  }
+})
+
+// GET /api/nft2/mints/:address - Get NFT2 mints for an address
+router.get('/nft2/mints/:address', validateAddress, async (req: Request, res: Response) => {
+  try {
+    const { address } = req.params
+    
+    const mints = getNFT2Mints(address)
+    const nextTokenId = mints.length
+
+    res.json({
+      success: true,
+      address: address.toLowerCase(),
+      mintsCount: mints.length,
+      nextTokenId,
+      mints,
+    })
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      error: err.message || 'Failed to get NFT2 mints',
+    })
+  }
+})
+
+// GET /api/nft2/next-token/:address - Get next token ID for an address
+router.get('/nft2/next-token/:address', validateAddress, async (req: Request, res: Response) => {
+  try {
+    const { address } = req.params
+    
+    const mints = getNFT2Mints(address)
+    const nextTokenId = mints.length
+
+    res.json({
+      success: true,
+      address: address.toLowerCase(),
+      nextTokenId,
+      totalMinted: mints.length,
+      maxSupply: 100,
+    })
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      error: err.message || 'Failed to get next token ID',
     })
   }
 })

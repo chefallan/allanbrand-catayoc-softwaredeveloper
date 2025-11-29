@@ -1,0 +1,33 @@
+{
+  "name": "CustomNFT #1",
+  "description": "CustomNFT #1 from the 100 piece collection. Rarity: Mythic. Element: Divine.",
+  "image": "ipfs://bafybeig5xvfwi2e2bdai6lngjzok2aktxeyqorx6gwpw25mu5p4bjmqtaa/base.svg",
+  "external_url": "https://blockchainintegration.dev",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "Mythic"
+    },
+    {
+      "trait_type": "Element",
+      "value": "Divine"
+    },
+    {
+      "trait_type": "Token ID",
+      "value": "1"
+    },
+    {
+      "trait_type": "Collection",
+      "value": "CustomNFT"
+    }
+  ],
+  "properties": {
+    "category": "utility",
+    "creators": [
+      {
+        "address": "0x",
+        "share": 100
+      }
+    ]
+  }
+}

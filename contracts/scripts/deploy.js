@@ -29,6 +29,14 @@ async function main() {
   const nftAddress = await customNFT.getAddress();
   console.log(`✅ CustomNFT deployed to: ${nftAddress}\n`);
 
+  // Deploy CustomNFT2 (ERC-721 with fixed collection)
+  console.log("🎨 Deploying CustomNFT2 (ERC-721 - Fixed Collection)...");
+  const CustomNFT2 = await ethers.getContractFactory("CustomNFT2");
+  const customNFT2 = await CustomNFT2.deploy();
+  await customNFT2.waitForDeployment();
+  const nft2Address = await customNFT2.getAddress();
+  console.log(`✅ CustomNFT2 deployed to: ${nft2Address}\n`);
+
   // Save deployment addresses
   const deploymentInfo = {
     network: hre.network.name,
@@ -44,6 +52,12 @@ async function main() {
         address: nftAddress,
         type: "ERC-721",
         baseURI: baseURI,
+      },
+      customNFT2: {
+        address: nft2Address,
+        type: "ERC-721 (Fixed Collection)",
+        metadataCID: "bafybeielhptx3zatpn2d63uabepujdw2zpuzglvvwshj33yjmzdult4o3i",
+        imageCID: "bafybeig5xvfwi2e2bdai6lngjzok2aktxeyqorx6gwpw25mu5p4bjmqtaa",
       },
     },
   };
@@ -65,8 +79,9 @@ async function main() {
   console.log(`Network: ${hre.network.name}`);
   console.log(`Deployer: ${deployer.address}`);
   console.log(`\nContracts:`);
-  console.log(`  ERC-20 Token: ${tokenAddress}`);
-  console.log(`  ERC-721 NFT:  ${nftAddress}`);
+  console.log(`  ERC-20 Token:        ${tokenAddress}`);
+  console.log(`  ERC-721 NFT:         ${nftAddress}`);
+  console.log(`  ERC-721 NFT2 (Fixed):${nft2Address}`);
   console.log("═".repeat(60));
 
   console.log("\n📚 Next Steps:");

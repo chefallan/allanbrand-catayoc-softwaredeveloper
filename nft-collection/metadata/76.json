@@ -1,0 +1,33 @@
+{
+  "name": "CustomNFT #76",
+  "description": "CustomNFT #76 from the 100 piece collection. Rarity: Uncommon. Element: Bronze.",
+  "image": "ipfs://bafybeig5xvfwi2e2bdai6lngjzok2aktxeyqorx6gwpw25mu5p4bjmqtaa/base.svg",
+  "external_url": "https://blockchainintegration.dev",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "Uncommon"
+    },
+    {
+      "trait_type": "Element",
+      "value": "Bronze"
+    },
+    {
+      "trait_type": "Token ID",
+      "value": "76"
+    },
+    {
+      "trait_type": "Collection",
+      "value": "CustomNFT"
+    }
+  ],
+  "properties": {
+    "category": "utility",
+    "creators": [
+      {
+        "address": "0x",
+        "share": 100
+      }
+    ]
+  }
+}

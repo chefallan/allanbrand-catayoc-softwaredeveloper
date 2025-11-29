@@ -1,0 +1,33 @@
+{
+  "name": "CustomNFT #47",
+  "description": "CustomNFT #47 from the 100 piece collection. Rarity: Epic. Element: Inferno.",
+  "image": "ipfs://bafybeig5xvfwi2e2bdai6lngjzok2aktxeyqorx6gwpw25mu5p4bjmqtaa/base.svg",
+  "external_url": "https://blockchainintegration.dev",
+  "attributes": [
+    {
+      "trait_type": "Rarity",
+      "value": "Epic"
+    },
+    {
+      "trait_type": "Element",
+      "value": "Inferno"
+    },
+    {
+      "trait_type": "Token ID",
+      "value": "47"
+    },
+    {
+      "trait_type": "Collection",
+      "value": "CustomNFT"
+    }
+  ],
+  "properties": {
+    "category": "utility",
+    "creators": [
+      {
+        "address": "0x",
+        "share": 100
+      }
+    ]
+  }
+}

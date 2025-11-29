@@ -9,12 +9,14 @@ Production-ready smart contracts for the Blockchain Super DApp: ERC-20 token (Cu
 
 | Contract | Type | Address | Network |
 |----------|------|---------|---------|
-| CustomToken | ERC-20 | `0x95C8f7166af42160a0C9472D6Db617163DEd44e8` | Sepolia |
-| CustomNFT | ERC-721 | `0xC561FE4044aF8B6176B64D8Da110420958411CAC` | Sepolia |
+| CustomToken | ERC-20 | `0x7dC6ADE8985B153b349a823bbcE30f10f2e2A66d` | Sepolia |
+| CustomNFT | ERC-721 | `0x4752489c774D296F41BA5D3F8A2C7E551299c9c6` | Sepolia |
+| CustomNFT2 | ERC-721 (Fixed Collection) | `0xEDb0064eB0299Fb22eEB3DeA79f5cd258328Aa0A` | Sepolia |
 
 **View on Etherscan:**
-- https://sepolia.etherscan.io/address/0x95C8f7166af42160a0C9472D6Db617163DEd44e8
-- https://sepolia.etherscan.io/address/0xC561FE4044aF8B6176B64D8Da110420958411CAC
+- Token: https://sepolia.etherscan.io/address/0x7dC6ADE8985B153b349a823bbcE30f10f2e2A66d
+- NFT: https://sepolia.etherscan.io/address/0x4752489c774D296F41BA5D3F8A2C7E551299c9c6
+- NFT2: https://sepolia.etherscan.io/address/0xEDb0064eB0299Fb22eEB3DeA79f5cd258328Aa0A
 
 ---
 
@@ -35,6 +37,17 @@ Production-ready smart contracts for the Blockchain Super DApp: ERC-20 token (Cu
 ✅ Batch minting (gas efficient)  
 ✅ OpenZeppelin standard implementation  
 ✅ Metadata functions (getMetadata, getInfo)  
+✅ Max supply: 100 NFTs  
+
+### CustomNFT2 (ERC-721 Fixed Collection) - NEW!
+✅ Fixed 100-piece IPFS collection  
+✅ Auto-URI generation (token ID based)  
+✅ Metadata CID hardcoded in contract  
+✅ Free minting (no payment required)  
+✅ Three minting methods (mint, batchMint, directMint)  
+✅ Rarity-based metadata (Mythic, Legendary, Epic, Rare, Uncommon, Common)  
+✅ SVG images with IPFS storage  
+✅ Persistent on-chain tracking  
 
 ---
 
@@ -44,10 +57,12 @@ Production-ready smart contracts for the Blockchain Super DApp: ERC-20 token (Cu
 contracts/
 ├── contracts/
 │   ├── CustomToken.sol              # ERC-20 implementation
-│   └── CustomNFT.sol                # ERC-721 implementation
+│   ├── CustomNFT.sol                # ERC-721 implementation
+│   └── CustomNFT2.sol               # ERC-721 Fixed Collection (NEW)
 ├── test/
 │   ├── CustomToken.test.js          # ERC-20 tests (39 passing ✅)
-│   └── CustomNFT.test.js            # ERC-721 tests (39 passing ✅)
+│   ├── CustomNFT.test.js            # ERC-721 tests (39 passing ✅)
+│   └── CustomNFT2.test.js           # ERC-721 Fixed Collection tests
 ├── scripts/
 │   └── deploy.js                    # Deployment script (Sepolia)
 ├── hardhat.config.js                # Hardhat configuration
@@ -123,19 +138,26 @@ REPORT_GAS=true npm test
 
 ### ✅ Already Deployed to Sepolia
 
-Both contracts are **already deployed and verified** on Sepolia testnet:
+All contracts are **already deployed and verified** on Sepolia testnet:
 
 **CustomToken (ERC-20)**
-- Address: `0x95C8f7166af42160a0C9472D6Db617163DEd44e8`
+- Address: `0x7dC6ADE8985B153b349a823bbcE30f10f2e2A66d`
 - Status: Verified on Etherscan
 - Block: Mined on Sepolia
 - Functions: Available on Etherscan "Read/Write" tabs
 
 **CustomNFT (ERC-721)**
-- Address: `0xC561FE4044aF8B6176B64D8Da110420958411CAC`
+- Address: `0x4752489c774D296F41BA5D3F8A2C7E551299c9c6`
 - Status: Verified on Etherscan
 - Block: Mined on Sepolia
 - Functions: Available on Etherscan "Read/Write" tabs
+
+**CustomNFT2 (ERC-721 Fixed Collection) - NEW**
+- Address: `0xEDb0064eB0299Fb22eEB3DeA79f5cd258328Aa0A`
+- Status: Verified on Etherscan
+- Collection Size: 100 pieces
+- Metadata CID: bafybeielhptx3zatpn2d63uabepujdw2zpuzglvvwshj33yjmzdult4o3i
+- Image CID: bafybeig5xvfwi2e2bdai6lngjzok2aktxeyqorx6gwpw25mu5p4bjmqtaa
 
 ### To Deploy Again (New Instance)
 
@@ -225,7 +247,7 @@ uint256 deploymentTimestamp;
 
 #### Example Usage (ethers.js)
 ```javascript
-const nft = await ethers.getContractAt("CustomNFT", "0xC561FE...");
+const nft = await ethers.getContractAt("CustomNFT", "0x4752489...");
 
 // Mint single NFT (FREE)
 const tx = await nft.safeMint(userAddress, "ipfs://QmHash/metadata.json");
@@ -252,13 +274,100 @@ console.log(owner);
 
 ---
 
+### CustomNFT2 (ERC-721 Fixed Collection) - NEW!
+
+**File:** `contracts/CustomNFT2.sol`
+
+**Purpose:** Fixed 100-piece IPFS collection with auto-increment minting and hardcoded metadata CID.
+
+#### Key Functions
+
+| Function | Access | Purpose |
+|----------|--------|---------|
+| `mint(address to)` | Owner | Mint next NFT in sequence (FREE) |
+| `batchMint(address to, uint256 count)` | Owner | Mint multiple NFTs (gas efficient) |
+| `directMint(address to, uint256 tokenId)` | Owner | Mint specific token ID (for recovery) |
+| `tokenURI(uint256 tokenId)` | Public | Auto-generates URI: `ipfs://metadataCID/{tokenId}.json` |
+| `totalSupply()` | Public | Returns total minted (blockchain source of truth) |
+| `maxSupply()` | Public | Returns 100 (fixed collection size) |
+| `getMetadata()` | Public | Returns metadata (VERSION, PROJECT, CID info) |
+| `getInfo()` | Public | Returns contract info |
+
+#### Configuration
+```solidity
+uint256 constant MAX_SUPPLY = 100;
+string constant METADATA_CID = "bafybeielhptx3zatpn2d63uabepujdw2zpuzglvvwshj33yjmzdult4o3i";
+string constant IPFS_GATEWAY = "https://ipfs.io/ipfs/";
+```
+
+#### Metadata Structure
+```solidity
+string constant VERSION = "1.0";
+string constant PROJECT = "Blockchain Integration Project";
+uint256 deploymentTimestamp;
+```
+
+#### Example Usage (ethers.js)
+```javascript
+const nft2 = await ethers.getContractAt("CustomNFT2", "0xEDb006...");
+
+// Mint next NFT in sequence (FREE) - Auto token ID
+const tx = await nft2.mint(userAddress);
+await tx.wait();
+
+// Get total supply (source of truth for next token ID)
+const totalSupply = await nft2.totalSupply();
+const nextTokenId = Number(totalSupply); // 0, 1, 2, ...
+
+// Get auto-generated URI for token 0
+const uri = await nft2.tokenURI(0);
+// Returns: ipfs://bafybeielhptx.../0.json
+
+// Check if collection is full
+const maxSupply = await nft2.maxSupply();
+const isFull = Number(totalSupply) >= maxSupply;
+
+// Get contract metadata
+const metadata = await nft2.getMetadata();
+console.log(metadata); // { version: "1.0", metadataCID: "bafybeielhptx...", ... }
+
+// Batch mint 10 NFTs (more gas efficient)
+await nft2.batchMint(userAddress, 10);
+```
+
+#### Rarity Distribution (100-piece Collection)
+```
+Mythic:    5 NFTs   (tokens 0-4)      [Legendary Power]
+Legendary: 20 NFTs  (tokens 5-24)     [Epic Achievement]
+Epic:      25 NFTs  (tokens 25-49)    [Rare Accomplishment]
+Rare:      20 NFTs  (tokens 50-69)    [Notable Success]
+Uncommon:  15 NFTs  (tokens 70-84)    [Standard Entry]
+Common:    15 NFTs  (tokens 85-99)    [Basic Collection]
+```
+
+#### IPFS Metadata Format
+Each metadata file (0.json - 99.json) contains:
+```json
+{
+  "name": "Blockchain Pioneer",
+  "description": "A pioneering member of the blockchain ecosystem",
+  "image": "ipfs://bafybeig5xvfwi2e2bdai6lngjzok2aktxeyqorx6gwpw25mu5p4bjmqtaa/base.svg",
+  "rarity": "Mythic",
+  "attributes": [
+    { "trait_type": "Type", "value": "Pioneer" },
+    { "trait_type": "Rarity", "value": "Mythic" }
+  ]
+}
+```
+
 ## 🔌 Interact with Deployed Contracts
 
 ### Method 1: Etherscan GUI (Easiest ⭐)
 
 1. Open contract on Etherscan:
-   - Token: https://sepolia.etherscan.io/address/0x95C8f7166af42160a0C9472D6Db617163DEd44e8
-   - NFT: https://sepolia.etherscan.io/address/0xC561FE4044aF8B6176B64D8Da110420958411CAC
+   - Token: https://sepolia.etherscan.io/address/0x7dC6ADE8985B153b349a823bbcE30f10f2e2A66d
+   - NFT: https://sepolia.etherscan.io/address/0x4752489c774D296F41BA5D3F8A2C7E551299c9c6
+   - NFT2: https://sepolia.etherscan.io/address/0xEDb0064eB0299Fb22eEB3DeA79f5cd258328Aa0A
 
 2. Click **"Read Contract"** tab:
    - `balanceOf(address)` - Check balance
@@ -276,8 +385,9 @@ console.log(owner);
 npx hardhat console --network sepolia
 
 # Load contracts
-const token = await ethers.getContractAt("CustomToken", "0x95C8f7...");
-const nft = await ethers.getContractAt("CustomNFT", "0xC561FE...");
+const token = await ethers.getContractAt("CustomToken", "0x7dC6AD...");
+const nft = await ethers.getContractAt("CustomNFT", "0x475248...");
+const nft2 = await ethers.getContractAt("CustomNFT2", "0xEDb006...");
 
 # Get signers
 const [owner, user1, user2] = await ethers.getSigners();

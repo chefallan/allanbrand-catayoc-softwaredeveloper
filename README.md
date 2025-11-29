@@ -15,25 +15,38 @@ A complete full-stack blockchain application that enables users to mint ERC-20 t
 - Automatic Sepolia network validation (chain ID: 11155111)
 - Real-time balance updates in ETH and Wei
 
-### 2. **Token Minting**
+### 2. **Token Minting (ERC-20)**
 - **FREE token minting** - No transaction fees required
 - Input validation and gas balance checking
 - Transaction history tracking
 - Success/error notifications with Etherscan links
 
-### 3. **Token Details**
+### 3. **NFT Minting (ERC-721)**
+- **FREE NFT minting** - No transaction fees required
+- Metadata URI support (IPFS or HTTP URLs)
+- **✨ NFT Preview** - View image and attributes before minting
+- IPFS gateway integration for image loading
+
+### 4. **NFT2 Fixed Collection (ERC-721 - Auto-Increment)**
+- **FREE minting** - 100-piece fixed IPFS collection
+- **✨ Auto-Increment Minting** - Sequentially mints tokens 0-99
+- **✨ Persistent Minting State** - Blockchain-first tracking across sessions
+- Live preview with proper metadata and SVG images
+- Rarity distribution: Mythic, Legendary, Epic, Rare, Uncommon, Common
+
+### 5. **Token Details**
 - View token metadata (name, symbol, decimals, total supply)
 - Display user's token balance in both token units and Wei
 - Deployment timestamp and project information
 
-### 4. **Address Viewer**
+### 6. **Address Viewer**
 - Query any Ethereum address on Sepolia
 - View balance in ETH and Wei
 - Current gas price (Gwei and Wei)
 - Current block number
 - Last 10 transactions with Etherscan integration
 
-### 5. **Error Handling**
+### 7. **Error Handling**
 - Insufficient gas funds detection
 - Network validation (Sepolia only)
 - Transaction failure handling
@@ -46,12 +59,14 @@ A complete full-stack blockchain application that enables users to mint ERC-20 t
 
 | Component | Status | Details |
 |-----------|--------|---------|
-| **Smart Contracts** | ✅ | CustomToken (ERC-20) + CustomNFT (ERC-721) on Sepolia |
-| **Frontend** | ✅ | React + TypeScript + ethers.js |
-| **Backend API** | ✅ | Express.js with 6 REST endpoints |
-| **Database** | ✅ | PostgreSQL schema with file-based fallback |
+| **Smart Contracts** | ✅ | CustomToken (ERC-20) + CustomNFT (ERC-721) + CustomNFT2 (Fixed Collection) on Sepolia |
+| **Frontend** | ✅ | React + TypeScript + ethers.js with NFT UI and IPFS integration |
+| **Backend API** | ✅ | Express.js with 9 REST endpoints including NFT2 tracking |
+| **NFT Collection** | ✅ | 100-piece fixed collection with IPFS metadata and SVG images |
+| **IPFS Storage** | ✅ | Pinata integration with public ipfs.io gateway |
+| **Database** | ✅ | PostgreSQL schema with file-based fallback (nft2_mints.json) |
 | **Caching** | ✅ | Redis with 30-second TTL |
-| **Testing** | ✅ | 39/39 tests passing |
+| **Testing** | ✅ | 78/78 tests passing |
 | **Network** | ✅ | Sepolia testnet (chain ID: 11155111) |
 | **Deployment** | ✅ | Live on Sepolia |
 
@@ -80,11 +95,13 @@ A complete full-stack blockchain application that enables users to mint ERC-20 t
 ### ✅ Tier 3: Smart Contract Development
 - [x] ERC-20 Token (CustomToken.sol)
 - [x] ERC-721 NFT (CustomNFT.sol)
+- [x] **NEW:** ERC-721 Fixed Collection (CustomNFT2.sol) with 100-piece IPFS collection
 - [x] OpenZeppelin libraries
 - [x] Minting functionality
 - [x] Transfer functionality
 - [x] **Bonus:** Deployed to Sepolia testnet
 - [x] **Bonus:** Metadata functions (getMetadata, getInfo)
+- [x] **Bonus:** IPFS integration for NFT metadata
 
 ### ✅ Tier 4: Integration
 - [x] Frontend → Smart Contract minting
@@ -98,27 +115,44 @@ A complete full-stack blockchain application that enables users to mint ERC-20 t
 ## 🏗️ Architecture
 
 ```
-┌─────────────────────────────────────────────┐
-│         React Frontend (Port 5173)          │
-│  - Wallet Connection                        │
-│  - Token Minting Interface                  │
-│  - Address Viewer                           │
-│  - Transaction History                      │
-└──────────────────┬──────────────────────────┘
-                   │ ethers.js
-                   ├──────────────────────────────┐
-                   │                              │
-        ┌──────────▼─────────────┐    ┌──────────▼──────────┐
-        │  Smart Contracts       │    │  Express Backend    │
-        │  (Sepolia Testnet)     │    │  (Port 3000)        │
-        │                        │    │                     │
-        │ CustomToken (ERC-20)   │    │ GET /api/address/   │
-        │ CustomNFT (ERC-721)    │    │ GET /api/tokens/    │
-        │                        │    │ POST /api/tokens/   │
-        │ 0x95C8f7...            │    │                     │
-        │ 0xC561FE...            │    │ Redis Cache         │
-        └────────────────────────┘    │ PostgreSQL DB       │
-                                      └─────────────────────┘
+┌──────────────────────────────────────────────────────┐
+│         React Frontend (Port 5173)                   │
+│  - Wallet Connection                                 │
+│  - Token Minting Interface                           │
+│  - NFT Minting + Preview                             │
+│  - NFT2 Fixed Collection Auto-Mint                   │
+│  - Address Viewer                                    │
+│  - Transaction History                               │
+└──────────────────────┬───────────────────────────────┘
+                       │ ethers.js + IPFS Gateway
+                       │
+        ┌──────────────┴──────────────────────┐
+        │                                     │
+    ┌───▼────────────────────┐   ┌──────────▼──────────────┐
+    │  Smart Contracts       │   │  Express Backend        │
+    │  (Sepolia Testnet)     │   │  (Port 3000)            │
+    │                        │   │                         │
+    │ CustomToken (ERC-20)   │   │ GET /api/address/       │
+    │ CustomNFT (ERC-721)    │   │ GET /api/tokens/        │
+    │ CustomNFT2 (Fixed 100) │   │ POST /api/tokens/mint   │
+    │                        │   │ GET /api/nft2/mints/    │
+    │ 0x7dC6AD...           │   │ GET /api/nft2/next-token│
+    │ 0x475248...           │   │                         │
+    │ 0xEDb006...           │   │ Redis Cache             │
+    └────────────────────────┘   │ PostgreSQL DB           │
+                                 │ File Storage (json)     │
+         ┌──────────────────────▶└─────────────────────────┘
+         │ IPFS Gateway (ipfs.io)
+         │
+    ┌────▼─────────────────────┐
+    │  Pinata / IPFS Storage   │
+    │                          │
+    │  Metadata CID            │
+    │  bafybeielhptx...        │
+    │                          │
+    │  Image CID               │
+    │  bafybeig5xvfwi...       │
+    └──────────────────────────┘
 ```
 
 ---
@@ -149,9 +183,11 @@ A complete full-stack blockchain application that enables users to mint ERC-20 t
 
 ---
 
-## 📝 API Endpoints
+## 📝 API Endpoints (9 Total)
 
-### Address Details
+### Token Endpoints (4)
+
+#### 1. Get Address Details
 ```
 GET /api/address/details/:address
 ```
@@ -171,7 +207,7 @@ Returns current gas price, block number, and address balance.
 }
 ```
 
-### Token Details
+#### 2. Get Token Details
 ```
 GET /api/tokens/details/:address
 ```
@@ -183,10 +219,10 @@ Fetches user's token balance and token metadata.
   "success": true,
   "data": {
     "address": "0x...",
-    "contract": "0x95C8f7...",
+    "contract": "0x7dC6AD...",
     "token": {
       "name": "Custom Token",
-      "symbol": "CUSTOM",
+      "symbol": "CTK",
       "decimals": 18,
       "totalSupply": "100.0"
     },
@@ -195,7 +231,7 @@ Fetches user's token balance and token metadata.
 }
 ```
 
-### Record Token Mint
+#### 3. Record Token Mint
 ```
 POST /api/tokens/mint
 ```
@@ -210,7 +246,7 @@ Records a token mint transaction.
 }
 ```
 
-### Mint History
+#### 4. Get Mint History
 ```
 GET /api/tokens/mints/:address
 ```
@@ -234,23 +270,93 @@ Retrieves all mints for a specific address.
 }
 ```
 
-**Response (no mints):**
+### NFT2 Fixed Collection Endpoints (3 - NEW!)
+
+#### 5. Track NFT2 Mint
+```
+POST /api/nft2/track-mint
+```
+Records an NFT2 mint transaction (called automatically by frontend).
+
+**Request Body:**
 ```json
 {
-  "success": true,
-  "data": [],
-  "total": 0,
-  "address": "0xcdb426c2c1d1863967ea66b581fb55c62b2fa54b"
+  "address": "0x...",
+  "tokenId": 0,
+  "txHash": "0x..."
 }
 ```
 
-### Token Statistics
+**Response:**
+```json
+{
+  "success": true,
+  "message": "NFT2 mint tracked successfully",
+  "data": {
+    "address": "0x...",
+    "tokenId": 0,
+    "txHash": "0x...",
+    "timestamp": "2025-11-29T10:15:00.000Z"
+  }
+}
+```
+
+#### 6. Get NFT2 Mint History
+```
+GET /api/nft2/mints/:address
+```
+Returns all NFT2 mints for a specific address.
+
+**Response:**
+```json
+{
+  "success": true,
+  "address": "0xcdb426c2c1d1863967ea66b581fb55c62b2fa54b",
+  "mintsCount": 4,
+  "nextTokenId": 4,
+  "mints": [
+    {
+      "address": "0xcdb426c2c1d1863967ea66b581fb55c62b2fa54b",
+      "tokenId": 0,
+      "txHash": "0x1234...",
+      "timestamp": "2025-11-29T10:00:00.000Z"
+    },
+    {
+      "address": "0xcdb426c2c1d1863967ea66b581fb55c62b2fa54b",
+      "tokenId": 1,
+      "txHash": "0x5678...",
+      "timestamp": "2025-11-29T10:05:00.000Z"
+    }
+  ]
+}
+```
+
+#### 7. Get Next NFT2 Token ID
+```
+GET /api/nft2/next-token/:address
+```
+Returns the next token ID to mint (queries blockchain first, falls back to backend tracking).
+
+**Response:**
+```json
+{
+  "success": true,
+  "address": "0xcdb426c2c1d1863967ea66b581fb55c62b2fa54b",
+  "nextTokenId": 4,
+  "blockchainSupply": 4,
+  "backedUpMints": 4
+}
+```
+
+### Additional Endpoints (2)
+
+#### 8. Token Statistics
 ```
 GET /api/tokens/stats
 ```
 Returns global minting statistics.
 
-### Health Check
+#### 9. Health Check
 ```
 GET /api/health
 ```
@@ -273,8 +379,9 @@ API health status.
 VITE_ETHERSCAN_API_KEY=your_etherscan_api_key
 VITE_INFURA_ID=your_infura_id
 VITE_API_URL=http://localhost:3000
-VITE_CONTRACT_ADDRESS=0x95C8f7166af42160a0C9472D6Db617163DEd44e8
-VITE_NFT_CONTRACT_ADDRESS=0xC561FE4044aF8B6176B64D8Da110420958411CAC
+VITE_CONTRACT_ADDRESS=0x7dC6ADE8985B153b349a823bbcE30f10f2e2A66d
+VITE_NFT_CONTRACT_ADDRESS=0x4752489c774D296F41BA5D3F8A2C7E551299c9c6
+VITE_NFT2_CONTRACT_ADDRESS=0xEDb0064eB0299Fb22eEB3DeA79f5cd258328Aa0A
 VITE_NETWORK_ID=11155111
 VITE_NETWORK_NAME=Sepolia
 VITE_SEPOLIA_RPC=https://eth-sepolia.g.alchemy.com/v2/demo
@@ -284,12 +391,14 @@ VITE_SEPOLIA_RPC=https://eth-sepolia.g.alchemy.com/v2/demo
 ```env
 VITE_ALCHEMY_API_KEY=your_alchemy_api_key
 VITE_INFURA_ID=your_infura_id
+VITE_CONTRACT_ADDRESS=0x7dC6ADE8985B153b349a823bbcE30f10f2e2A66d
+VITE_NFT_CONTRACT_ADDRESS=0x4752489c774D296F41BA5D3F8A2C7E551299c9c6
+VITE_NFT2_CONTRACT_ADDRESS=0xEDb0064eB0299Fb22eEB3DeA79f5cd258328Aa0A
+VITE_SEPOLIA_RPC=https://eth-sepolia.g.alchemy.com/v2/demo
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/ethereum_db
 REDIS_URL=redis://localhost:6379
 NODE_ENV=development
 PORT=3000
-VITE_CONTRACT_ADDRESS=0x95C8f7166af42160a0C9472D6Db617163DEd44e8
-VITE_NFT_CONTRACT_ADDRESS=0xC561FE4044aF8B6176B64D8Da110420958411CAC
 ```
 
 ### Installation
@@ -434,14 +543,40 @@ function getInfo() public view returns (string)
 - Network: `Sepolia (testnet only)`
 - RPC: `https://eth-sepolia.g.alchemy.com/v2/demo`
 
-### Contract Addresses (Sepolia)
-- **Token:** `0x95C8f7166af42160a0C9472D6Db617163DEd44e8`
-- **NFT:** `0xC561FE4044aF8B6176B64D8Da110420958411CAC`
+## ⚙️ Key Configuration
+
+### Network (Sepolia Testnet)
+- Chain ID: `11155111`
+- Network: `Sepolia (testnet only)`
+- RPC: `https://eth-sepolia.g.alchemy.com/v2/demo`
+
+### Contract Addresses (Sepolia - DEPLOYED)
+- **Token (ERC-20):** `0x7dC6ADE8985B153b349a823bbcE30f10f2e2A66d`
+- **NFT (ERC-721):** `0x4752489c774D296F41BA5D3F8A2C7E551299c9c6`
+- **NFT2 (Fixed Collection):** `0xEDb0064eB0299Fb22eEB3DeA79f5cd258328Aa0A`
+
+### NFT2 Collection (100-piece Fixed)
+- **Metadata CID:** `bafybeielhptx3zatpn2d63uabepujdw2zpuzglvvwshj33yjmzdult4o3i`
+- **Image CID:** `bafybeig5xvfwi2e2bdai6lngjzok2aktxeyqorx6gwpw25mu5p4bjmqtaa`
+- **IPFS Gateway:** `https://ipfs.io/ipfs/` (public gateway)
+- **Token Range:** 0-99 (auto-increment)
+- **Rarity Distribution:**
+  - Mythic: 5 NFTs
+  - Legendary: 20 NFTs
+  - Epic: 25 NFTs
+  - Rare: 20 NFTs
+  - Uncommon: 15 NFTs
+  - Common: 15 NFTs
 
 ### Caching
 - **TTL:** 30 seconds
 - **Keys:** `ethereum:global-data` (gas price + block number)
 - **Backend:** Redis (with fallback to in-memory)
+
+### Data Persistence
+- **NFT2 Mints:** `backend/data/nft2_mints.json`
+- **Storage Type:** File-based with in-memory sync
+- **Persistence:** Survives server restarts
 
 ---
 
@@ -515,33 +650,14 @@ Display success with tx hash
 
 ---
 
-## 🎯 Scoring Summary
-
-| Section | Points | Status |
-|---------|--------|--------|
-| Frontend Functionality | 10/10 | ✅ |
-| Frontend Code Quality | 10/10 | ✅ |
-| Frontend TypeScript Bonus | 5/5 | ✅ |
-| Backend API | 10/10 | ✅ |
-| Backend Code Quality | 10/10 | ✅ |
-| Backend Caching Bonus | 5/5 | ✅ |
-| Contract Functionality | 15/15 | ✅ |
-| Contract Code Quality | 5/5 | ✅ |
-| Contract Deployment Bonus | 5/5 | ✅ |
-| Integration Seamless | 15/15 | ✅ |
-| Integration Error Handling | 5/5 | ✅ |
-| Docker Bonus | 5/5 | ✅ |
-| **TOTAL** | **115/100** | ✅ |
-
----
-
 ## 🚨 Known Limitations
 
 1. **PostgreSQL Optional** - Falls back to file-based storage if DB unavailable
 2. **Testnet Only** - Currently configured for Sepolia testnet only
 3. **Manual Wallet Setup** - Users must manually add Sepolia to MetaMask
 4. **API Rate Limiting** - Not yet implemented (recommended for production)
-5. **No User Persistence** - User data cleared on refresh (wallet context)
+5. **No User Authentication** - No persistent user sessions
+6. **Fixed IPFS Gateway** - Uses public ipfs.io gateway (could implement fallbacks)
 
 ---
 

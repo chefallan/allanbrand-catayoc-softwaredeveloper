@@ -17,7 +17,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
  * - Token transfers between users
  * - Customizable base URI
  * - Optional minting fees
- * - Max supply: 10,000 NFTs
+ * - Max supply: 100 NFTs
  * 
  * @notice This is a demonstration ERC-721 NFT contract for the Blockchain Integration Project
  * @custom:version 1.0
@@ -32,7 +32,7 @@ contract CustomNFT is ERC721, Ownable {
     mapping(uint256 => string) private _tokenURIs;
 
     // Maximum total supply cap (optional)
-    uint256 public constant MAX_SUPPLY = 10_000;
+    uint256 public constant MAX_SUPPLY = 100;
 
     // Base URI for metadata
     string public baseURI;
@@ -241,7 +241,7 @@ contract CustomNFT is ERC721, Ownable {
             VERSION,
             " - ",
             PROJECT,
-            " - Max Supply: 10K NFTs"
+            " - Max Supply: 100 NFTs"
         ));
     }
 }
