@@ -222,10 +222,12 @@ function loadNFT2Mints() {
         }
         nft2Mints.get(addr)!.push(mint)
       }
-      console.log(`✓ Loaded ${mints.length} NFT2 mints from file`)
+      console.log(`✓ Loaded ${mints.length} NFT2 mints from ${NFT2_MINTS_FILE}`)
+    } else {
+      console.log(`[DB] NFT2 mints file does not exist yet: ${NFT2_MINTS_FILE}`)
     }
   } catch (error) {
-    console.warn('Could not load NFT2 mints file, starting fresh')
+    console.warn(`[DB] Could not load NFT2 mints file from ${NFT2_MINTS_FILE}, starting fresh:`, error)
   }
 }
 
@@ -234,6 +236,7 @@ function saveNFT2Mints() {
     const dir = path.dirname(NFT2_MINTS_FILE)
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true })
+      console.log(`[DB] Created directory: ${dir}`)
     }
     
     const allMints: NFT2Mint[] = []
@@ -242,14 +245,17 @@ function saveNFT2Mints() {
     }
     
     fs.writeFileSync(NFT2_MINTS_FILE, JSON.stringify(allMints, null, 2))
-    console.log(`[DB] NFT2 mints saved: ${allMints.length} total mints`)
+    console.log(`[DB] NFT2 mints saved to ${NFT2_MINTS_FILE}: ${allMints.length} total mints`)
   } catch (error) {
-    console.error('Error saving NFT2 mints:', error)
+    console.error(`[DB] Error saving NFT2 mints to ${NFT2_MINTS_FILE}:`, error)
   }
 }
 
 export function getNFT2Mints(address: string): NFT2Mint[] {
-  return nft2Mints.get(address.toLowerCase()) || []
+  const lowerAddress = address.toLowerCase()
+  const mints = nft2Mints.get(lowerAddress) || []
+  console.log(`[DB] getNFT2Mints(${lowerAddress}): found ${mints.length} mints, tokenIds: ${mints.map(m => m.tokenId).join(', ')}`)
+  return mints
 }
 
 export function addNFT2Mint(address: string, tokenId: number, txHash: string): NFT2Mint {
@@ -264,6 +270,8 @@ export function addNFT2Mint(address: string, tokenId: number, txHash: string): N
     nft2Mints.set(address.toLowerCase(), [])
   }
   nft2Mints.get(address.toLowerCase())!.push(mint)
+  
+  console.log(`[DB] Added NFT2 mint: ${address} Token #${tokenId}`)
   
   // Save to file immediately
   saveNFT2Mints()

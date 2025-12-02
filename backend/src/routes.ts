@@ -398,24 +398,54 @@ router.get('/test/cache', async (req: Request, res: Response) => {
 
 // NFT2 Minting tracking
 // POST /api/nft2/track-mint - Track NFT2 mint for an address
-router.post('/nft2/track-mint', validateAddress, async (req: Request, res: Response) => {
+router.post('/nft2/track-mint', async (req: Request, res: Response) => {
   try {
     const { address, tokenId, txHash } = req.body
     
-    if (!address || typeof tokenId !== 'number' || !txHash) {
+    console.log('[ROUTE] POST /nft2/track-mint received full body:', JSON.stringify(req.body))
+    
+    // Validate required fields
+    if (!address || tokenId === undefined || tokenId === null || !txHash) {
+      console.log('[ROUTE] Validation failed:', { 
+        hasAddress: !!address, 
+        hasTokenId: tokenId !== undefined && tokenId !== null,
+        tokenIdValue: tokenId,
+        hasTxHash: !!txHash 
+      })
       res.status(400).json({
         success: false,
         error: 'Missing required fields: address, tokenId, txHash',
+        received: { address, tokenId, txHash }
+      })
+      return
+    }
+    
+    // Convert tokenId to number if it's a string
+    const tokenIdNum = typeof tokenId === 'string' ? parseInt(tokenId, 10) : Number(tokenId)
+    
+    if (isNaN(tokenIdNum)) {
+      res.status(400).json({
+        success: false,
+        error: 'tokenId must be a valid number',
+      })
+      return
+    }
+    
+    // Validate address format
+    if (!/^0x[a-fA-F0-9]{40}$/.test(address)) {
+      res.status(400).json({
+        success: false,
+        error: 'Invalid Ethereum address format',
       })
       return
     }
 
     // Add to database (persisted)
-    const mint = addNFT2Mint(address, tokenId, txHash)
+    const mint = addNFT2Mint(address, tokenIdNum, txHash)
 
     res.json({
       success: true,
-      message: `Tracked NFT2 mint: Token #${tokenId}`,
+      message: `Tracked NFT2 mint: Token #${tokenIdNum}`,
       data: mint,
     })
   } catch (err: any) {
@@ -432,7 +462,13 @@ router.get('/nft2/mints/:address', validateAddress, async (req: Request, res: Re
     const { address } = req.params
     
     const mints = getNFT2Mints(address)
-    const nextTokenId = mints.length
+    
+    // Calculate next token ID based on the highest token ID minted
+    let nextTokenId = 0
+    if (mints.length > 0) {
+      const maxTokenId = Math.max(...mints.map(m => m.tokenId))
+      nextTokenId = maxTokenId + 1
+    }
 
     res.json({
       success: true,
@@ -455,7 +491,16 @@ router.get('/nft2/next-token/:address', validateAddress, async (req: Request, re
     const { address } = req.params
     
     const mints = getNFT2Mints(address)
-    const nextTokenId = mints.length
+    console.log(`[ROUTE] /nft2/next-token for ${address}: mints.length=${mints.length}, mints=${JSON.stringify(mints)}`)
+    
+    // Calculate next token ID based on the highest token ID minted
+    let nextTokenId = 0
+    if (mints.length > 0) {
+      const tokenIds = mints.map(m => m.tokenId)
+      const maxTokenId = Math.max(...tokenIds)
+      nextTokenId = maxTokenId + 1
+      console.log(`[ROUTE] tokenIds: ${tokenIds.join(', ')}, maxTokenId: ${maxTokenId}, nextTokenId: ${nextTokenId}`)
+    }
 
     res.json({
       success: true,
